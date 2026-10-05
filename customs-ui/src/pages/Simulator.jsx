@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Zap, Play, RotateCcw, Mail, FileCode, Globe, Eye,
   CheckCircle, XCircle, AlertTriangle, ShieldAlert, ShieldCheck,
-  Loader, Radio,
+  Loader,
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────
@@ -113,7 +113,7 @@ function eventToStep(evt) {
     case 'EFFECT_DETECTED':
       return { phase: 'Checkpoint 2', phaseN: 2, status: 'block',
         msg: `🚨 Undeclared effect: ${(d.unexplained || []).join(', ')}`,
-        sub: 'This recipient / host / payload was NOT in the agent's declared tool call arguments.' };
+        sub: 'This recipient / host / payload was NOT in the agent\'s declared tool call arguments.' };
     case 'CP2_EVALUATING':
       return { phase: 'Checkpoint 2', phaseN: 2, status: 'info',
         msg: 'Checkpoint 2 — Effect Reconciler running…',
@@ -342,18 +342,6 @@ export default function Simulator({ customsEnabled, setCustomsEnabled }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
           <Zap size={16} color="var(--accent)" />
           <h2 style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--t-1)' }}>Attack Simulator</h2>
-          {/* Backend status indicator */}
-          <span style={{
-            marginLeft: 8, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em',
-            textTransform: 'uppercase', padding: '2px 8px', borderRadius: 99,
-            background: backendOk === true ? 'var(--green-bg)' : backendOk === false ? 'var(--red-bg)' : 'var(--bg-2)',
-            color: backendOk === true ? 'var(--green)' : backendOk === false ? 'var(--red-text)' : 'var(--t-4)',
-            border: `1px solid ${backendOk === true ? 'var(--green-bd)' : backendOk === false ? 'var(--red-bd)' : 'var(--border)'}`,
-            display: 'flex', alignItems: 'center', gap: 4,
-          }}>
-            <Radio size={9} />
-            {backendOk === true ? 'Backend live' : backendOk === false ? 'Backend offline' : 'Connecting…'}
-          </span>
         </div>
         <p style={{ fontSize: 12, color: 'var(--t-3)', maxWidth: 600, lineHeight: 1.6 }}>
           Pick a real attack scenario. Each run hits the <strong style={{ color: 'var(--t-1)' }}>live backend</strong> — real policy

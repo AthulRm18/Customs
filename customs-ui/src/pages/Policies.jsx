@@ -59,7 +59,6 @@ export default function Policies() {
       <div className="sec-head">
         <div>
           <div className="sec-title">Security Policies</div>
-          <div className="sec-sub">Deterministic rules applied at each checkpoint — no ML required</div>
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
           <span className="pill pill-green">{pols.filter(p => p.enabled).length} active</span>

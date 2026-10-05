@@ -37,7 +37,7 @@ const THREATS = [
     id: 't5', icon: Mail, severity: 'HIGH', cp: 2,
     name: 'Undeclared Recipient Detection',
     plain: 'Any email address or webhook URL that appears in a server\'s outbound request but was never mentioned by the agent is automatically blocked.',
-    howCaught: 'Pure deterministic matching — no ML. Declared recipients vs actual recipients. Any extra = dropped.',
+    howCaught: 'Declared recipients vs actual recipients — any undeclared address in the outbound request is automatically dropped.',
     effects: ['Applies to all email, webhook, API calls', 'No machine learning required', 'Zero false negatives on undeclared data'],
     status: 'ACTIVE DETECTION', scenario: 'Ongoing',
   },
