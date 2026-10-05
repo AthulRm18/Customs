@@ -8,10 +8,30 @@ from typing import Any, Optional
 
 # ── Fake Filesystem ─────────────────────────────────────────
 
+def _normalize_path(path: str) -> str:
+    norm = path.strip().replace("\\", "/")
+    if norm.startswith("./"):
+        norm = norm[2:]
+    if norm.startswith(".\\"):
+        norm = norm[2:]
+    # Handle simulated full paths like /home/user/...
+    if ".aws/credentials" in norm:
+        return ".aws/credentials"
+    if ".env" in norm:
+        return ".env"
+    if "src/" in norm:
+        return "src/" + norm.split("src/", 1)[1]
+    return norm.lstrip("/")
+
+
 class FakeFilesystem:
     """In-memory virtual filesystem. Never touches the real disk."""
 
     def __init__(self):
+        self._init_files()
+        self._access_log: list[dict[str, Any]] = []
+
+    def _init_files(self):
         self._files: dict[str, str] = {
             "src/auth.js": 'const jwt = require("jsonwebtoken");\nfunction verifyToken(token) {\n  return jwt.verify(token, process.env.JWT_SECRET);\n}\nmodule.exports = { verifyToken };\n',
             "src/login.js": 'const { verifyToken } = require("./auth");\nasync function handleLogin(req, res) {\n  const { username, password } = req.body;\n  // TODO: fix validation bug\n  const user = await db.findUser(username);\n  if (user && user.password === password) {\n    res.json({ token: jwt.sign({ id: user.id }, SECRET) });\n  }\n}\n',
@@ -34,12 +54,13 @@ class FakeFilesystem:
             "package.json": '{"name": "my-app", "version": "1.0.0", "main": "src/app.js"}\n',
             "README.md": '# My App\nA simple web application.\n',
         }
-        self._access_log: list[dict[str, Any]] = []
 
     def read(self, call_id: str, path: str) -> Optional[str]:
         """Read a file. Returns None if not found."""
-        norm = path.strip().lstrip("./")
+        norm = _normalize_path(path)
         content = self._files.get(norm)
+        if content is None:
+            content = self._files.get(path.strip())
 
         self._access_log.append({
             "call_id": call_id,
@@ -52,7 +73,7 @@ class FakeFilesystem:
         return content
 
     def write(self, call_id: str, path: str, content: str):
-        norm = path.strip().lstrip("./")
+        norm = _normalize_path(path)
         self._files[norm] = content
         self._access_log.append({
             "call_id": call_id,
@@ -66,6 +87,10 @@ class FakeFilesystem:
         if call_id:
             return [e for e in self._access_log if e["call_id"] == call_id]
         return list(self._access_log)
+
+    def clear(self):
+        self._init_files()
+        self._access_log.clear()
 
     def clear_log(self):
         self._access_log.clear()
@@ -222,7 +247,6 @@ fake_email = FakeEmailService()
 
 def reset_all():
     """Reset all fake infrastructure for a fresh demo run."""
-    global fake_fs, fake_net, fake_email
-    fake_fs = FakeFilesystem()
-    fake_net = FakeNetwork()
-    fake_email = FakeEmailService()
+    fake_fs.clear()
+    fake_net.clear()
+    fake_email.clear()

@@ -97,8 +97,10 @@ def is_known_malicious(host_or_url: str) -> bool:
 
 
 def _extract_host(url: str) -> str:
-    """Extract hostname from a URL or return as-is if already a host."""
+    """Extract hostname from a URL, email, or return as-is if already a host."""
     url = url.strip()
+    if "@" in url:
+        url = url.split("@")[-1]
     # Handle protocol prefixes
     for prefix in ("https://", "http://", "smtp://", "ftp://"):
         if url.lower().startswith(prefix):
