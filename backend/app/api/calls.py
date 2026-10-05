@@ -1,6 +1,7 @@
 """API endpoints for tool call evaluation and execution."""
 from __future__ import annotations
 
+import asyncio
 from fastapi import APIRouter, HTTPException
 
 from app.schemas import ToolCallRequest, CP1Result, PipelineResult
@@ -11,15 +12,15 @@ router = APIRouter(prefix="/api/calls", tags=["Calls"])
 
 
 @router.post("/evaluate", response_model=CP1Result)
-def evaluate_call(req: ToolCallRequest):
+async def evaluate_call(req: ToolCallRequest):
     """Checkpoint 1 only: evaluate a tool call before running it."""
-    return call_firewall.evaluate(req)
+    return await asyncio.to_thread(call_firewall.evaluate, req)
 
 
 @router.post("/execute", response_model=PipelineResult)
-def execute_call(req: ToolCallRequest):
+async def execute_call(req: ToolCallRequest):
     """Full security pipeline: CP1 → MCP Server execution → CP2 Reconciler → Enforcement."""
-    return effect_customs.execute_pipeline(req)
+    return await asyncio.to_thread(effect_customs.execute_pipeline, req)
 
 
 @router.get("", response_model=list[PipelineResult])

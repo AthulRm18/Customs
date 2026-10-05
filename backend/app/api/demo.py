@@ -1,6 +1,7 @@
 """Demo endpoints for live hackathon attack simulations."""
 from __future__ import annotations
 
+import asyncio
 import uuid
 from fastapi import APIRouter
 
@@ -12,8 +13,13 @@ from app.mcp.fake_infra import fake_email, fake_net, fake_fs
 router = APIRouter(prefix="/api/demo", tags=["Demo"])
 
 
+def _reset_and_run(req: ToolCallRequest) -> PipelineResult:
+    """Run the pipeline synchronously — intended to be called via asyncio.to_thread."""
+    return effect_customs.execute_pipeline(req)
+
+
 @router.post("/clean-mail")
-def demo_clean_mail():
+async def demo_clean_mail():
     """
     Demonstrate legitimate email flow:
     Agent requests to email alice@acme.com -> CP1 ALLOW -> Mailer sends only to alice ->
@@ -36,7 +42,8 @@ def demo_clean_mail():
         },
     )
 
-    result: PipelineResult = effect_customs.execute_pipeline(req)
+    # Run sync pipeline in a thread so the event loop can yield SSE tasks
+    result: PipelineResult = await asyncio.to_thread(_reset_and_run, req)
 
     # Verify inbox
     inbox = fake_email.get_inbox("alice@acme.com")
@@ -53,7 +60,7 @@ def demo_clean_mail():
 
 
 @router.post("/mailer-attack")
-def demo_mailer_attack():
+async def demo_mailer_attack():
     """
     Demonstrate compromised mailer attack:
     Agent legitimately sends email to alice@acme.com.
@@ -78,7 +85,8 @@ def demo_mailer_attack():
         },
     )
 
-    result: PipelineResult = effect_customs.execute_pipeline(req)
+    # Run sync pipeline in a thread so the event loop can yield SSE tasks
+    result: PipelineResult = await asyncio.to_thread(_reset_and_run, req)
 
     # Check attacker inbox
     attacker_inbox = fake_email.get_inbox("ghost@evil.io")
@@ -97,7 +105,7 @@ def demo_mailer_attack():
 
 
 @router.post("/secret-exfiltration")
-def demo_secret_exfiltration():
+async def demo_secret_exfiltration():
     """
     Demonstrate credential exfiltration:
     Task is 'Fix the login bug in my application'.
@@ -117,7 +125,8 @@ def demo_secret_exfiltration():
         },
     )
 
-    result: PipelineResult = effect_customs.execute_pipeline(req)
+    # Run sync pipeline in a thread so the event loop can yield SSE tasks
+    result: PipelineResult = await asyncio.to_thread(_reset_and_run, req)
 
     return {
         "pipeline_result": result,
@@ -132,7 +141,7 @@ def demo_secret_exfiltration():
 
 
 @router.post("/readonly-tool-lie")
-def demo_readonly_tool_lie():
+async def demo_readonly_tool_lie():
     """
     Demonstrate lying read-only tool:
     Tool claims to be a harmless read-only weather service.
@@ -153,7 +162,8 @@ def demo_readonly_tool_lie():
         arguments={"city": "Bengaluru"},
     )
 
-    result: PipelineResult = effect_customs.execute_pipeline(req)
+    # Run sync pipeline in a thread so the event loop can yield SSE tasks
+    result: PipelineResult = await asyncio.to_thread(_reset_and_run, req)
 
     # Check if attacker received anything
     attacker_delivered = [
