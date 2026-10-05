@@ -4,6 +4,38 @@
 
 ---
 
+## Teammate Setup (clone and run in 5 minutes)
+
+If someone wants to pick this up on their laptop:
+
+**Prerequisites:** [Python 3.11+](https://python.org/downloads) · [Node 18+](https://nodejs.org) · [Git](https://git-scm.com)
+
+```bash
+# 1 — Clone the repo
+git clone https://github.com/AthulRm18/Customs.git
+cd Customs
+
+# 2 — Start the backend
+cd backend
+pip install -e .
+uvicorn app.main:app --reload --port 8000
+
+# 3 — Open a second terminal, start the frontend
+cd customs-ui
+npm install
+npm run dev
+```
+
+That's it. Frontend at **http://localhost:5173**, API at **http://localhost:8000/docs**.
+
+To pull the latest changes later:
+
+```bash
+git pull origin main
+```
+
+---
+
 ## The Problem
 
 AI agents are being given real tools — email, filesystems, GitHub, APIs — through the **Model Context Protocol (MCP)**. The standard way to secure this is to check what the agent *asks for* before running it.
