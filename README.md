@@ -1,40 +1,8 @@
 # Customs
 
 > Runtime security enforcement for AI agents using MCP tools.
+<img width="1234" height="670" alt="Screenshot 2026-10-05 014446" src="https://github.com/user-attachments/assets/c99310fd-3282-4a94-bde3-ff26b259c396" />
 
----
-
-## Teammate Setup (clone and run in 5 minutes)
-
-If someone wants to pick this up on their laptop:
-
-**Prerequisites:** [Python 3.11+](https://python.org/downloads) · [Node 18+](https://nodejs.org) · [Git](https://git-scm.com)
-
-```bash
-# 1 — Clone the repo
-git clone https://github.com/AthulRm18/Customs.git
-cd Customs
-
-# 2 — Start the backend
-cd backend
-pip install -e .
-uvicorn app.main:app --reload --port 8000
-
-# 3 — Open a second terminal, start the frontend
-cd customs-ui
-npm install
-npm run dev
-```
-
-That's it. Frontend at **http://localhost:5173**, API at **http://localhost:8000/docs**.
-
-To pull the latest changes later:
-
-```bash
-git pull origin main
-```
-
----
 
 ## The Problem
 
